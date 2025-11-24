@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # --------------------------------------
+  # PostgreSQL existant
+  # --------------------------------------
+  elishama-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: elishama_db
+      POSTGRES_USER: elishama_user
+      POSTGRES_PASSWORD: elishama_pass
+    volumes:
+      - D:/docker/afor_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U elishama_user -d elishama_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --------------------------------------
+  # Backend Node.js / Express
+  # --------------------------------------
+  backend:
+    build: ./back-end
+    env_file: ./back-end/.env
+    depends_on:
+      elishama-db:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./back-end:/usr/src/app
+    command: sh -c "npx prisma migrate deploy || true && node src/index.js"
+
+  # --------------------------------------
+  # Frontend React
+  # --------------------------------------
+  frontend:
+    build: ./front-end
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
