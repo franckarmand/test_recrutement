@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   # --------------------------------------
-  # PostgreSQL existant
+  # PostgreSQL
   # --------------------------------------
   elishama-db:
     image: postgres:15
@@ -10,10 +8,10 @@ services:
       POSTGRES_DB: elishama_db
       POSTGRES_USER: elishama_user
       POSTGRES_PASSWORD: elishama_pass
-    volumes:
-      - D:/docker/afor_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    volumes:
+      - D:/docker/francky-postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U elishama_user -d elishama_db"]
       interval: 5s
@@ -31,17 +29,20 @@ services:
         condition: service_healthy
     ports:
       - "4000:4000"
-    volumes:
-      - ./back-end:/usr/src/app
+    # Do not bind-mount the host project into the container here; it
+    # would overwrite the application files that were built into the image
+    # (including node_modules). The container image contains the app.
     command: sh -c "npx prisma migrate deploy || true && node src/index.js"
 
   # --------------------------------------
-  # Frontend React
+  # Frontend React / Vite
   # --------------------------------------
   frontend:
     build: ./front-end
+    # Serve the frontend image built in the Dockerfile. Avoid bind-mounting
+    # the host folder to prevent overwriting installed dependencies.
     ports:
-      - "3000:80"
+      - "5173:5173"
     depends_on:
       - backend
 

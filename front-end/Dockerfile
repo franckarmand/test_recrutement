@@ -1,14 +1,14 @@
-# Étape de build
-FROM node:20-alpine AS build
+FROM node:20-alpine
+
 WORKDIR /usr/src/app
+
+# Copier seulement package.json pour accélérer le build
 COPY package*.json ./
 RUN npm install
-COPY . .
-RUN npm run build
 
-# Étape Nginx
-FROM nginx:stable-alpine
-# Copier le bon dossier de build
-COPY --from=build /usr/src/app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Copier tout le code
+COPY . .
+
+EXPOSE 5173 
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
