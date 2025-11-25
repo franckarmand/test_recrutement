@@ -180,10 +180,10 @@ export default function Login() {
 
             {/* Sign Up Link */}
             <p className="mt-8 text-center text-sm text-gray-600">
-              Pas encore de compte ?{" "}
-              <button className="font-semibold text-blue-600 hover:text-blue-700">
+              Pas encore de compte ?{' '}
+              <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-700">
                 Créer un compte
-              </button>
+              </Link>
             </p>
           </div>
         </div>
