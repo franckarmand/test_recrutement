@@ -183,7 +183,7 @@ export default function Register() {
 
               <p className="mt-8 text-center text-sm text-gray-600">
                 Déjà inscrit ?{' '}
-                <Link to="/" className="font-semibold text-blue-600 hover:text-blue-700">
+                <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700">
                   Se connecter
                 </Link>
               </p>
