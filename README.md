@@ -2,7 +2,7 @@
 
 ## 📋 Description du Projet
 
-Application web complète permettant la gestion d'articles avec authentification JWT. Stack moderne conteneurisée avec React, Node.js, PostgreSQL et Docker.
+Application web simple permettant la gestion d'articles avec authentification JWT. Stack moderne conteneurisée avec React, Node.js, PostgreSQL et Docker.
 
 **Stack technique :** React 19 + React Router 7, Node.js 20 + Express 5, PostgreSQL 15, Prisma 7, Docker Compose
 
