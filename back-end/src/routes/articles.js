@@ -66,6 +66,7 @@ router.post('/', authMiddleware, async (req, res) => {
       data: {
         title,
         content,
+        userId: req.userId,
       },
     });
 
@@ -86,6 +87,19 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Le titre et le contenu sont requis' });
     }
 
+    // Vérifier que l'article appartient à l'utilisateur
+    const existingArticle = await prisma.article.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingArticle) {
+      return res.status(404).json({ message: 'Article non trouvé' });
+    }
+
+    if (existingArticle.userId !== req.userId) {
+      return res.status(403).json({ message: 'Vous n\'êtes pas autorisé à modifier cet article' });
+    }
+
     const article = await prisma.article.update({
       where: { id: parseInt(id) },
       data: { title, content },
@@ -102,6 +116,19 @@ router.put('/:id', authMiddleware, async (req, res) => {
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Vérifier que l'article appartient à l'utilisateur
+    const existingArticle = await prisma.article.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingArticle) {
+      return res.status(404).json({ message: 'Article non trouvé' });
+    }
+
+    if (existingArticle.userId !== req.userId) {
+      return res.status(403).json({ message: 'Vous n\'êtes pas autorisé à supprimer cet article' });
+    }
 
     await prisma.article.delete({
       where: { id: parseInt(id) },

@@ -133,18 +133,21 @@ curl -X POST http://localhost:4000/articles \
 
 ```prisma
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String   // Hash bcrypt
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
   firstName String
   lastName  String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  articles  Article[]
 }
 
 model Article {
   id        Int      @id @default(autoincrement())
   title     String
   content   String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 ```

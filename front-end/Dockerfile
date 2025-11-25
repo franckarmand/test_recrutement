@@ -12,10 +12,8 @@ RUN npm install --legacy-peer-deps && \
 # Copier tout le code
 COPY . .
 
-# Exposer le port
 EXPOSE 5173
 
-# Important : définir NODE_ENV
 ENV NODE_ENV=development
 
 # Commande de démarrage
