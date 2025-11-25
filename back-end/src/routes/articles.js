@@ -33,6 +33,26 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// GET /articles/:id - Récupérer un article spécifique
+router.get('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const article = await prisma.article.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!article) {
+      return res.status(404).json({ message: 'Article non trouvé' });
+    }
+
+    res.json(article);
+  } catch (err) {
+    console.error('Error fetching article:', err);
+    res.status(500).json({ message: 'Erreur lors de la récupération de l\'article' });
+  }
+});
+
 // POST /articles - Créer un nouvel article
 router.post('/', authMiddleware, async (req, res) => {
   try {
@@ -53,6 +73,28 @@ router.post('/', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Error creating article:', err);
     res.status(500).json({ message: 'Erreur lors de la création de l\'article' });
+  }
+});
+
+// PUT /articles/:id - Modifier un article
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ message: 'Le titre et le contenu sont requis' });
+    }
+
+    const article = await prisma.article.update({
+      where: { id: parseInt(id) },
+      data: { title, content },
+    });
+
+    res.json(article);
+  } catch (err) {
+    console.error('Error updating article:', err);
+    res.status(500).json({ message: 'Erreur lors de la modification de l\'article' });
   }
 });
 
