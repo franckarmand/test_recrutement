@@ -1,9 +1,7 @@
 services:
-  # --------------------------------------
-  # PostgreSQL
-  # --------------------------------------
   elishama-db:
-    image: postgres:15
+    image: postgres:15-alpine
+    container_name: elishama-db
     environment:
       POSTGRES_DB: elishama_db
       POSTGRES_USER: elishama_user
@@ -11,46 +9,70 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - D:/docker/francky-postgres:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U elishama_user -d elishama_db"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - elishama-network
+    shm_size: 128mb
+    mem_limit: 512m
+    cpus: 1.0
 
-  # --------------------------------------
-  # Backend Node.js / Express
-  # --------------------------------------
   backend:
-    build: ./back-end
+    build: 
+      context: ./back-end
+      dockerfile: Dockerfile
+    container_name: elishama-backend
     env_file: ./back-end/.env
     depends_on:
       elishama-db:
         condition: service_healthy
     ports:
       - "4000:4000"
-    # Do not bind-mount the host project into the container here; it
-    # would overwrite the application files that were built into the image
-    # (including node_modules). The container image contains the app.
-    command: sh -c "npx prisma migrate deploy || true && node src/index.js"
+    volumes:
+      - ./back-end:/usr/src/app:cached
+      - backend_node_modules:/usr/src/app/node_modules
+    command: sh -c "npx prisma migrate deploy && node src/index.js"
+    networks:
+      - elishama-network
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 1.0
 
-  # --------------------------------------
-  # Frontend React / Vite
-  # --------------------------------------
   frontend:
-    build: ./front-end
-    # Serve the frontend image built in the Dockerfile. Avoid bind-mounting
-    # the host folder to prevent overwriting installed dependencies.
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: elishama-frontend
+    stdin_open: true
+    tty: true
     ports:
       - "5173:5173"
+    volumes:
+      - ./front-end:/usr/src/app:cached
+      - frontend_node_modules:/usr/src/app/node_modules
+      - /usr/src/app/.react-router
+      - /usr/src/app/build
     environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:4000
       - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
     depends_on:
       - backend
-    # Use the CMD defined in the frontend image (which should be `npm run dev`).
-    # Avoid running `npm ci` at container start — it installs dependencies on
-    # every start and slows down the developer flow. Rebuild the image when
-    # dependencies change with `docker compose build frontend`.
+    networks:
+      - elishama-network
+    restart: unless-stopped
+    mem_limit: 1536m  # 1.5 GB pour éviter ENOMEM
+    cpus: 2.0
 
+networks:
+  elishama-network:
+    driver: bridge
 
+volumes:
+  postgres_data:
+  backend_node_modules:
+  frontend_node_modules:

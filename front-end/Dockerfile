@@ -1,13 +1,22 @@
-FROM node:20-alpine AS build
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Copier seulement package.json et lock pour optimiser le cache Docker
+# Copier package files
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
 
-# Copier le reste du projet
+# Installation
+RUN npm install --legacy-peer-deps && \
+    npm cache clean --force
+
+# Copier tout le code
 COPY . .
 
-# Générer les fichiers de build Vite
-RUN npm run build
+# Exposer le port
+EXPOSE 5173
+
+# Important : définir NODE_ENV
+ENV NODE_ENV=development
+
+# Commande de démarrage
+CMD ["npm", "run", "dev"]
