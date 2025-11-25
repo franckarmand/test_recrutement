@@ -27,6 +27,8 @@ services:
       dockerfile: Dockerfile
     container_name: elishama-backend
     env_file: ./back-end/.env
+    environment:
+      - PRISMA_CLIENT_ENGINE_TYPE=binary
     depends_on:
       elishama-db:
         condition: service_healthy
