@@ -48,7 +48,9 @@ services:
       - WATCHPACK_POLLING=true
     depends_on:
       - backend
-    command: >
-      sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173"
+    # Use the CMD defined in the frontend image (which should be `npm run dev`).
+    # Avoid running `npm ci` at container start — it installs dependencies on
+    # every start and slows down the developer flow. Rebuild the image when
+    # dependencies change with `docker compose build frontend`.
 
 
