@@ -13,7 +13,7 @@ export default defineConfig({
       interval: 1000,
     },
     hmr: {
-      host: "host.docker.internal",
+      host: "127.0.0.1",
       port: 5173,
     },
   },
