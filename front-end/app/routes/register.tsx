@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { registerUser } from "../lib/api";
 
 export default function Register() {
@@ -59,9 +59,9 @@ export default function Register() {
           <div className="mt-8 lg:mt-0 text-sm">
             <p className="text-slate-500 dark:text-slate-400">
               Vous avez déjà un compte ?
-              <a className="font-medium text-primary hover:underline ml-2" href="/login">
+              <Link className="font-medium text-primary hover:underline ml-2" to="/login">
                 Se connecter
-              </a>
+              </Link>
             </p>
           </div>
         </div>

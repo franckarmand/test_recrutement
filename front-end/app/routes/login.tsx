@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { loginUser } from "../lib/api";
 
 export default function Login() {
@@ -47,9 +47,9 @@ export default function Login() {
           <div className="mt-8 lg:mt-0 text-sm">
             <p className="text-slate-500 dark:text-slate-400">
               Pas encore de compte ?
-              <a className="font-medium text-primary hover:underline ml-2" href="/register">
+              <Link className="font-medium text-primary hover:underline ml-2" to="/register">
                 S'inscrire
-              </a>
+              </Link>
             </p>
           </div>
         </div>
