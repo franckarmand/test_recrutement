@@ -15,6 +15,15 @@ export default function Login() {
       setError("Veuillez remplir tous les champs.");
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Veuillez entrer une adresse e-mail valide.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
     setLoading(true);
     try {
       const data = await loginUser({ email, password });

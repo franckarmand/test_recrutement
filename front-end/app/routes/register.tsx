@@ -17,6 +17,15 @@ export default function Register() {
       setError("Veuillez remplir tous les champs obligatoires.");
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Veuillez entrer une adresse e-mail valide.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");
       return;
