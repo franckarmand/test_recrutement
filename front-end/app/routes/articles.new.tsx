@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { createArticle } from "../lib/api";
 
 export default function NewArticle() {
   const navigate = useNavigate();
@@ -43,24 +44,7 @@ export default function NewArticle() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const API = (import.meta.env.VITE_API_URL as string) || "http://127.0.0.1:4000";
-      
-      const res = await fetch(`${API}/articles`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, content }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Erreur lors de la création de l'article");
-      }
-
+      await createArticle({ title, content });
       navigate('/articles');
     } catch (err: any) {
       setError(err.message || "Une erreur est survenue");

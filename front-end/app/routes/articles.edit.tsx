@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
+import { getArticle, updateArticle } from "../lib/api";
 
 export default function EditArticle() {
   const navigate = useNavigate();
@@ -33,22 +34,7 @@ export default function EditArticle() {
     setLoading(true);
     
     try {
-      const token = localStorage.getItem('token');
-      const API = (import.meta.env.VITE_API_URL as string) || "http://127.0.0.1:4000";
-      
-      const res = await fetch(`${API}/articles/${id}`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Erreur lors du chargement de l'article");
-      }
-
+      const data = await getArticle(id!);
       setTitle(data.title);
       setContent(data.content);
     } catch (err: any) {
@@ -75,24 +61,7 @@ export default function EditArticle() {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const API = (import.meta.env.VITE_API_URL as string) || "http://127.0.0.1:4000";
-      
-      const res = await fetch(`${API}/articles/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, content }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Erreur lors de la modification de l'article");
-      }
-
+      await updateArticle(id!, { title, content });
       navigate('/articles');
     } catch (err: any) {
       setError(err.message || "Une erreur est survenue");

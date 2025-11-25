@@ -6,5 +6,5 @@ export default [
 	{ path: "register", file: "routes/register.tsx" },
 	{ path: "articles", file: "routes/articles.tsx" },
 	{ path: "articles/new", file: "routes/articles.new.tsx" },
-	{ path: "articles/:id/edit", file: "routes/articles.$id.edit.tsx" },
+	{ path: "articles/:id/edit", file: "routes/articles.edit.tsx" },
 ] satisfies RouteConfig;

@@ -102,3 +102,56 @@ export async function deleteArticle(id: number) {
     throw new Error(err.message || 'Network error while deleting article');
   }
 }
+
+export async function getArticle(id: string) {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const res = await timeoutFetch(`${API}/articles/${id}`, {
+      method: "GET",
+      headers,
+    }, 10000);
+    return await handleResponse(res as Response);
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('Request timed out (10s)');
+    throw new Error(err.message || 'Network error while fetching article');
+  }
+}
+
+export async function createArticle(data: { title: string; content: string }) {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const res = await timeoutFetch(`${API}/articles`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(data),
+    }, 10000);
+    return await handleResponse(res as Response);
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('Request timed out (10s)');
+    throw new Error(err.message || 'Network error while creating article');
+  }
+}
+
+export async function updateArticle(id: string, data: { title: string; content: string }) {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const res = await timeoutFetch(`${API}/articles/${id}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(data),
+    }, 10000);
+    return await handleResponse(res as Response);
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('Request timed out (10s)');
+    throw new Error(err.message || 'Network error while updating article');
+  }
+}
