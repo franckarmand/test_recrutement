@@ -7,6 +7,8 @@ export default function ArticlesList() {
   const [user, setUser] = useState<any>(null);
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [deleteArticleId, setDeleteArticleId] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -45,13 +47,13 @@ export default function ArticlesList() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return;
-
     try {
       await deleteArticle(id);
       setArticles(articles.filter(a => a.id !== id));
+      setDeleteArticleId(null);
     } catch (err: any) {
       alert(err.message || 'Erreur lors de la suppression');
+      setDeleteArticleId(null);
     }
   };
 
@@ -62,6 +64,7 @@ export default function ArticlesList() {
     } catch (e) {
       console.warn('LocalStorage not available', e);
     }
+    setShowLogoutModal(false);
     navigate('/login');
   };
 
@@ -107,7 +110,7 @@ export default function ArticlesList() {
                   Retour
                 </button>
                 <button 
-                  onClick={handleLogout}
+                  onClick={() => setShowLogoutModal(true)}
                   className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                 >
                   Déconnexion
@@ -186,7 +189,7 @@ export default function ArticlesList() {
                             </svg>
                           </button>
                           <button
-                            onClick={() => handleDelete(article.id)}
+                            onClick={() => setDeleteArticleId(article.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                             title="Supprimer"
                           >
@@ -204,6 +207,68 @@ export default function ArticlesList() {
           )}
         </main>
       </div>
+
+      {/* Modal de confirmation de suppression */}
+      {deleteArticleId && (
+        <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Supprimer l'article</h3>
+            </div>
+            <p className="text-gray-600 mb-6">Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.</p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setDeleteArticleId(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => handleDelete(deleteArticleId)}
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:shadow-lg transition-all duration-200"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmation de déconnexion */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Confirmer la déconnexion</h3>
+            </div>
+            <p className="text-gray-600 mb-6">Êtes-vous sûr de vouloir vous déconnecter ?</p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:shadow-lg transition-all duration-200"
+              >
+                Déconnecter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
