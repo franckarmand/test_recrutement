@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -42,7 +43,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    // Suspense fallback gives immediate feedback while route modules / client
+    // loaders hydrate. This improves perceived UX when modules are being
+    // hot-reloaded or the client is reconnecting to HMR.
+    <Suspense
+      fallback={
+        <div className="w-full h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
+          <div className="text-center">
+            <div className="animate-pulse text-primary text-2xl font-semibold">Chargement…</div>
+          </div>
+        </div>
+      }
+    >
+      <Outlet />
+    </Suspense>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

@@ -156,7 +156,7 @@ export default function Register() {
                 </a>
                 et notre
                 <a className="underline hover:text-primary" href="#">
-                  Politique de confidentialité
+                  Politique de confidentialité.
                 </a>
               </p>
             </div>

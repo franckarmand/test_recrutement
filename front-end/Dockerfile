@@ -2,13 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Copier seulement package.json pour accélérer le build
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
-# Copier tout le code
 COPY . .
 
-EXPOSE 5173 
+EXPOSE 5173
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
