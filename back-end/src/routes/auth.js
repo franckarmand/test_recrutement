@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
 		});
 
 		const token = jwt.sign(
-			{ sub: user.id, email: user.email },
+			{ id: user.id, email: user.email },
 			process.env.JWT_SECRET || 'change-me',
 			{ expiresIn: '7d' }
 		);
@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
 		if (!ok) return res.status(401).send('Email ou mot de passe incorrect.');
 
 		const token = jwt.sign(
-			{ sub: user.id, email: user.email },
+			{ id: user.id, email: user.email },
 			process.env.JWT_SECRET || 'change-me',
 			{ expiresIn: '7d' }
 		);
