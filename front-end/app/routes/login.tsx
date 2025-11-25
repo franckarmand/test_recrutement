@@ -17,13 +17,16 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      const data = await loginUser({ email, password }).catch(() => ({}));
+      const data = await loginUser({ email, password });
       if ((data as any)?.token) {
-        // Note: localStorage ne fonctionne pas dans les artifacts Claude
-        // mais fonctionne dans votre vrai projet
-        console.log("Token reçu:", (data as any).token);
+        try {
+          localStorage.setItem('token', (data as any).token);
+          localStorage.setItem('user', JSON.stringify((data as any).user || {}));
+        } catch (e) {
+          console.warn('LocalStorage not available', e);
+        }
       }
-      navigate("/");
+      navigate('/');
     } catch (err: any) {
       setError(err?.message || "Erreur inconnue");
     } finally {

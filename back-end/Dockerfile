@@ -2,18 +2,17 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Installation des dépendances
+# Copier package.json et prisma
 COPY package*.json ./
 COPY prisma ./prisma/
-RUN npm install
 
-# Générer le client Prisma
-RUN npx prisma generate
+# Installer les dépendances
+RUN npm install
 
 # Copier le reste du code
 COPY . .
 
-EXPOSE 4000
+# Ne PAS exécuter prisma generate ici si tu montes un volume local
+# CMD sera overridé par docker-compose
 
-# Le CMD sera overridé par docker-compose
-CMD ["node", "src/index.js"]
+EXPOSE 4000

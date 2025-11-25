@@ -10,7 +10,15 @@ type LoginPayload = {
   password: string;
 };
 
-const API = (import.meta.env.VITE_API_URL as string) || "http://localhost:4000";
+const API = (import.meta.env.VITE_API_URL as string) || "http://127.0.0.1:4000";
+console.log('[API] base url=', API);
+
+function timeoutFetch(url: string, init: RequestInit = {}, ms = 10000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), ms);
+  const finalInit = { ...init, signal: controller.signal };
+  return fetch(url, finalInit).finally(() => clearTimeout(id));
+}
 
 async function handleResponse(res: Response) {
   const text = await res.text();
@@ -26,24 +34,37 @@ async function handleResponse(res: Response) {
 }
 
 export async function registerUser(payload: RegisterPayload) {
-  const res = await fetch(`${API}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  return handleResponse(res);
+  try {
+    const res = await timeoutFetch(`${API}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }, 10000);
+    return await handleResponse(res as Response);
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('Request timed out (10s)');
+    throw new Error(err.message || 'Network error while registering');
+  }
 }
 
 export async function loginUser(payload: LoginPayload) {
-  const res = await fetch(`${API}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  return handleResponse(res);
+  try {
+    const res = await timeoutFetch(`${API}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }, 10000);
+    return await handleResponse(res as Response);
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('Request timed out (10s)');
+    throw new Error(err.message || 'Network error while logging in');
+  }
 }
 
 export async function fetchItems() {
-  const res = await fetch(`${API}/items`, { method: "GET" });
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(`${API}/items`, { method: "GET", headers });
   return handleResponse(res);
 }

@@ -33,14 +33,15 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - ./back-end:/usr/src/app:cached
-      - backend_node_modules:/usr/src/app/node_modules
-    command: sh -c "npx prisma migrate deploy && node src/index.js"
+      - ./back-end:/usr/src/app
+      - /usr/src/app/node_modules
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && node src/index.js"
     networks:
       - elishama-network
     restart: unless-stopped
     mem_limit: 512m
     cpus: 1.0
+
 
   frontend:
     build:

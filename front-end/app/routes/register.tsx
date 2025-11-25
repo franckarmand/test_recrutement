@@ -30,8 +30,16 @@ export default function Register() {
         password,
       };
 
-      await registerUser(payload);
-      navigate("/login");
+      const data = await registerUser(payload);
+      if ((data as any)?.token) {
+        try {
+          localStorage.setItem('token', (data as any).token);
+          localStorage.setItem('user', JSON.stringify((data as any).user || {}));
+        } catch (e) {
+          console.warn('LocalStorage not available', e);
+        }
+      }
+      navigate('/');
     } catch (err: any) {
       setError(err?.message || "Erreur inconnue");
     } finally {
