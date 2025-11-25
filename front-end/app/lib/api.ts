@@ -68,3 +68,37 @@ export async function fetchItems() {
   const res = await fetch(`${API}/items`, { method: "GET", headers });
   return handleResponse(res);
 }
+
+export async function fetchArticles() {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const res = await timeoutFetch(`${API}/articles`, {
+      method: "GET",
+      headers,
+    }, 10000);
+    return await handleResponse(res as Response);
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('Request timed out (10s)');
+    throw new Error(err.message || 'Network error while fetching articles');
+  }
+}
+
+export async function deleteArticle(id: number) {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const res = await timeoutFetch(`${API}/articles/${id}`, {
+      method: "DELETE",
+      headers,
+    }, 10000);
+    return await handleResponse(res as Response);
+  } catch (err: any) {
+    if (err.name === 'AbortError') throw new Error('Request timed out (10s)');
+    throw new Error(err.message || 'Network error while deleting article');
+  }
+}

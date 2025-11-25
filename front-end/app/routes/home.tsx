@@ -120,7 +120,7 @@ export default function Home() {
 
             {/* Mes Articles */}
             <button
-              onClick={() => window.location.href = '/articles'}
+              onClick={() => navigate('/articles')}
               className="group bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-left"
             >
               <div className="w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
