@@ -111,12 +111,12 @@ docker-compose down -v     # + supprimer les données
 # Inscription
 curl -X POST http://localhost:4000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"firstName":"John","lastName":"Doe","email":"john@test.com","password":"pass123"}'
+  -d '{"firstName":"Kouassi","lastName":"Franck","email":"Kouassi@test.com","password":"pass123"}'
 
 # Connexion
 curl -X POST http://localhost:4000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"john@test.com","password":"pass123"}'
+  -d '{"email":"Kouassi@test.com","password":"pass123"}'
 
 # Créer un article (avec token)
 curl -X POST http://localhost:4000/articles \
