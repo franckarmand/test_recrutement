@@ -25,6 +25,16 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     const articles = await prisma.article.findMany({
       orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
     });
     res.json(articles);
   } catch (err) {
@@ -40,6 +50,16 @@ router.get('/:id', authMiddleware, async (req, res) => {
 
     const article = await prisma.article.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
     });
 
     if (!article) {
