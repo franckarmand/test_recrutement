@@ -174,6 +174,25 @@ docker-compose exec elishama-db psql -U elishama_user -d elishama_db  # PostgreS
 
 ---
 
+## 📸 Captures d'écran
+
+### Page d'Inscription
+![Page d'inscription](./screenshots/inscription.png)
+
+### Page de Connexion
+![Page de connexion](./screenshots/connexion.png)
+
+### Dashboard
+![Dashboard](./screenshots/dash.png)
+
+### Liste des Articles
+![Liste des articles](./screenshots/article.png)
+
+### Ajout d'Article
+![Ajout d'article](./screenshots/ajout.png)
+
+---
+
 ## 🎯 Livrables du Test de Recrutement
 
 ✅ **Frontend React** - React Router 7 + Vite + Tailwind CSS + TypeScript  
