@@ -95,34 +95,178 @@ docker-compose down -v     # + supprimer les données
 
 **Authentification :** Header `Authorization: Bearer <jwt_token>` sur routes protégées
 
+### Routes d'Authentification
+
 | Méthode | Endpoint | Auth | Description |
 |---------|----------|------|-------------|
-| POST | `/auth/register` | Non | Créer un compte |
-| POST | `/auth/login` | Non | Se connecter |
-| GET | `/articles` | Oui | Liste des articles |
-| GET | `/articles/:id` | Oui | Détails d'un article |
-| POST | `/articles` | Oui | Créer un article |
-| PUT | `/articles/:id` | Oui | Modifier un article |
-| DELETE | `/articles/:id` | Oui | Supprimer un article |
+| POST | `/auth/register` | Non | Créer un compte utilisateur |
+| POST | `/auth/login` | Non | Se connecter et obtenir un token JWT |
 
-**Exemples de requêtes :**
+#### POST /auth/register
+**Body :**
+```json
+{
+  "firstName": "Franck",
+  "lastName": "Kouassi",
+  "email": "franck@example.com",
+  "password": "password123"
+}
+```
+**Réponse (201) :**
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "franck@example.com",
+    "firstName": "Franck",
+    "lastName": "Kouassi",
+    "createdAt": "2025-11-26T10:00:00.000Z"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### POST /auth/login
+**Body :**
+```json
+{
+  "email": "franck@example.com",
+  "password": "password123"
+}
+```
+**Réponse (200) :**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "email": "franck@example.com",
+    "firstName": "Franck",
+    "lastName": "Kouassi"
+  }
+}
+```
+
+### Routes des Articles
+
+| Méthode | Endpoint | Auth | Description |
+|---------|----------|------|-------------|
+| GET | `/articles` | Oui | Liste tous les articles avec informations auteur |
+| GET | `/articles/:id` | Oui | Détails d'un article spécifique |
+| POST | `/articles` | Oui | Créer un nouvel article |
+| PUT | `/articles/:id` | Oui | Modifier un article (propriétaire uniquement) |
+| DELETE | `/articles/:id` | Oui | Supprimer un article (propriétaire uniquement) |
+
+#### GET /articles
+**Headers :** `Authorization: Bearer <token>`  
+**Réponse (200) :**
+```json
+[
+  {
+    "id": 1,
+    "title": "Mon premier article",
+    "content": "Contenu de l'article...",
+    "userId": 1,
+    "createdAt": "2025-11-26T10:00:00.000Z",
+    "user": {
+      "id": 1,
+      "firstName": "Franck",
+      "lastName": "Kouassi",
+      "email": "franck@example.com"
+    }
+  }
+]
+```
+
+#### GET /articles/:id
+**Headers :** `Authorization: Bearer <token>`  
+**Réponse (200) :** Objet article avec informations auteur  
+**Réponse (404) :** `{"message": "Article non trouvé"}`
+
+#### POST /articles
+**Headers :** `Authorization: Bearer <token>`  
+**Body :**
+```json
+{
+  "title": "Titre de l'article",
+  "content": "Contenu de l'article..."
+}
+```
+**Réponse (201) :**
+```json
+{
+  "id": 2,
+  "title": "Titre de l'article",
+  "content": "Contenu de l'article...",
+  "userId": 1,
+  "createdAt": "2025-11-26T11:00:00.000Z"
+}
+```
+
+#### PUT /articles/:id
+**Headers :** `Authorization: Bearer <token>`  
+**Body :**
+```json
+{
+  "title": "Titre modifié",
+  "content": "Contenu modifié..."
+}
+```
+**Réponse (200) :** Article modifié  
+**Réponse (403) :** `{"message": "Vous n'êtes pas autorisé à modifier cet article"}`  
+**Réponse (404) :** `{"message": "Article non trouvé"}`
+
+#### DELETE /articles/:id
+**Headers :** `Authorization: Bearer <token>`  
+**Réponse (200) :** `{"message": "Article supprimé avec succès"}`  
+**Réponse (403) :** `{"message": "Vous n'êtes pas autorisé à supprimer cet article"}`  
+**Réponse (404) :** `{"message": "Article non trouvé"}`
+
+### Codes de Réponse HTTP
+
+| Code | Description |
+|------|-------------|
+| 200 | Succès |
+| 201 | Ressource créée |
+| 400 | Requête invalide (champs manquants) |
+| 401 | Non authentifié (token manquant/invalide) |
+| 403 | Non autorisé (pas propriétaire) |
+| 404 | Ressource non trouvée |
+| 409 | Conflit (email déjà utilisé) |
+| 500 | Erreur serveur |
+
+### Exemples de Requêtes cURL
 
 ```bash
 # Inscription
 curl -X POST http://localhost:4000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"firstName":"Kouassi","lastName":"Franck","email":"Kouassi@test.com","password":"pass123"}'
+  -d '{"firstName":"Franck","lastName":"Kouassi","email":"franck@test.com","password":"password123"}'
 
 # Connexion
 curl -X POST http://localhost:4000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"Kouassi@test.com","password":"pass123"}'
+  -d '{"email":"franck@test.com","password":"password123"}'
 
-# Créer un article (avec token)
+# Lister les articles
+curl -X GET http://localhost:4000/articles \
+  -H "Authorization: Bearer <votre_token>"
+
+# Créer un article
 curl -X POST http://localhost:4000/articles \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <votre_token>" \
-  -d '{"title":"Mon article","content":"Contenu..."}'
+  -d '{"title":"Mon article","content":"Contenu de mon article..."}'
+
+# Modifier un article
+curl -X PUT http://localhost:4000/articles/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <votre_token>" \
+  -d '{"title":"Titre modifié","content":"Contenu modifié..."}'
+
+# Supprimer un article
+curl -X DELETE http://localhost:4000/articles/1 \
+  -H "Authorization: Bearer <votre_token>"
 ```
 
 ---
